@@ -1,0 +1,269 @@
+IAM:
+  Roles:
+    - Name: k8sMasterRole
+      Policies:
+        - Name: k8sMasterBasePolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:DescribeInstances",
+                  "ec2:DescribeRegions",
+                  "ec2:CreateTags",
+                  "ec2:DescribeAccountAttributes",
+                  "ec2:ModifyInstanceAttribute"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:DescribeVpcs",
+                  "ec2:DescribeSecurityGroups",
+                  "ec2:DescribeSubnets",
+                  "ec2:DescribeRouteTables",
+                  "ec2:DescribeInternetGateways",
+                  "ec2:CreateSecurityGroup"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:CreateRoute",
+                  "ec2:DeleteRoute",
+                  "ec2:DeleteSecurityGroup",
+                  "ec2:AuthorizeSecurityGroupIngress",
+                  "ec2:RevokeSecurityGroupIngress"
+                ],
+                "Resource": "*",
+                "Condition": {
+                  "StringEquals": {
+                    "ec2:ResourceTag/kubernetes.io/cluster/<cluster_name>": "owned"
+                  }
+                }
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "iam:CreateServiceLinkedRole"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "kms:DescribeKey"
+                ],
+                "Resource": "*"
+              }
+              ]
+            }
+        - Name: k8sLBManagerRolePolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:DescribeVpcs",
+                  "elasticloadbalancing:AddTags",
+                  "elasticloadbalancing:CreateListener",
+                  "elasticloadbalancing:CreateTargetGroup",
+                  "elasticloadbalancing:DeleteListener",
+                  "elasticloadbalancing:DeleteTargetGroup",
+                  "elasticloadbalancing:DeregisterTargets",
+                  "elasticloadbalancing:DescribeListeners",
+                  "elasticloadbalancing:DescribeLoadBalancerPolicies",
+                  "elasticloadbalancing:DescribeTargetGroups",
+                  "elasticloadbalancing:DescribeTargetHealth",
+                  "elasticloadbalancing:ModifyListener",
+                  "elasticloadbalancing:ModifyTargetGroup",
+                  "elasticloadbalancing:RegisterTargets",
+                  "elasticloadbalancing:SetLoadBalancerPoliciesOfListener"
+                ],
+                "Resource": "*"
+              }
+              ]
+            }
+        - Name: k8sPVManagerRolePolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:DescribeVolumes",
+                  "ec2:DescribeVolumesModifications",
+                  "ec2:CreateVolume",
+                  "ec2:ModifyVolume"
+                ],
+                "Resource": "*"
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "ec2:AttachVolume",
+                  "ec2:DeleteVolume",
+                  "ec2:DetachVolume"
+                ],
+                "Resource": "*",
+                "Condition": {
+                  "StringEquals": {
+                    "ec2:ResourceTag/kubernetes.io/cluster/<cluster_name>": "owned"
+                  }
+                }
+              }
+              ]
+            }
+        - Name: k8sAutoscalingPolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "autoscaling:DescribeAutoScalingGroups",
+                  "autoscaling:DescribeLaunchConfigurations",
+                  "autoscaling:DescribeTags",
+                  "ec2:DescribeLaunchTemplateVersions"
+                ],
+                "Resource": "*"
+              }
+              ]
+            }
+        - Name: k8sCNINetworkingPolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:AttachNetworkInterface",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DetachNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:ModifyNetworkInterfaceAttribute",
+                    "ec2:AssignPrivateIpAddresses",
+                    "ec2:UnassignPrivateIpAddresses"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ec2:CreateTags",
+                  "Resource": "arn:aws:ec2:*:*:network-interface/*"
+                }
+              ]
+            }
+    - Name: k8sWorkerRole
+      Policies:
+        - Name: k8sWorkerBasePolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:DescribeInstances",
+                    "ec2:DescribeRegions"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+        - Name: k8sCNINetworkingPolicy
+          Json: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:CreateNetworkInterface",
+                    "ec2:AttachNetworkInterface",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DetachNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:ModifyNetworkInterfaceAttribute",
+                    "ec2:AssignPrivateIpAddresses",
+                    "ec2:UnassignPrivateIpAddresses"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ec2:CreateTags",
+                  "Resource": "arn:aws:ec2:*:*:network-interface/*"
+                }
+              ]
+            }
+  Profiles:
+    - Name: k8sMasterProfile
+      Role: k8sMasterRole
+    - Name: k8sWorkerProfile
+      Role: k8sWorkerRole
+Network:
+  - VPC: [existing]
+    CIDR: 10.4.16.0/22
+    Availability Zone: us-west-1a
+    Auto-assign public IPv4 address: No
+    Auto-assign IPv6 address: No
+    Tags:
+      - name: Name
+        value: k8s-dev-cidr1
+      - name: kubernetes.io/cluster/<cluster_name>
+        value: "owned"
+      - name: k8s.io/cluster/<cluster_name>
+        value: "owned"
+EC2:
+  Instancies:
+    - AMI ID: [new, based on Amazonlinux 2]
+      Instance type: t3a.medium
+      Subnet: k8s-dev-cidr1
+      Auto-assign Public IP: No
+      IAM role: k8sMasterRole
+      Monitoring: no
+      Tags:
+        - name: kubernetes.io/cluster/<cluster_name>
+          value: "owned"
+        - name: k8s.io/cluster/<cluster_name>
+          value: "owned"
+  Autoscaling groups:
+    - Group name: k8s-dev-worker
+      Launch Template: k8sWorkerLaunchTemplate
+      Launch Template Version: Latest
+      Fleet Composition: Adhere to the launch template
+      Desired Capacity: 3
+      Minimum Group Size: 3
+      Maximum Group Size: 3
+      Network: [existing vpc]
+      Subnet: k8s-dev-cidr1
+      Health Check Grace Period: 300
+      Health Check Type: EC2
+      Tags:
+        - name: kubernetes.io/cluster/<cluster_name>
+          value: "owned"
+        - name: k8s.io/cluster/<cluster_name>
+          value: "owned"
+        - name: k8s.io/cluster-autoscaler/enabled
+          value: "owned"
+        - name: k8s.io/cluster-autoscaler/<cluster_name>
+          value: "owned"
+  Launch templates:
+    - AMI ID: [new, based on Amazonlinux 2]
+      Instance type: t3a.large
+      Key pair name: none
+      Network type: VPC
+      Security Groups: don't include
+      IAM instance profile: k8sWorkerProfile
+      Purchasing option: spot
